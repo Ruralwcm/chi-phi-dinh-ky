@@ -468,32 +468,42 @@ document.addEventListener('DOMContentLoaded',function(){
       photos:fileBase64?[fileBase64]:[]
     };
 
-    // Dùng text/plain để tránh CORS preflight với no-cors
-    fetch(APPS_SCRIPT_URL,{
-      method:'POST',
-      mode:'no-cors',
-      headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify(payload)
-    })
-      .then(function(){
-        var d=document.getElementById('successDetail');
-        d.innerHTML=
-          '<div class="row"><span class="lbl">Thời gian</span><span class="val">'+ts+'</span></div>'+
-          '<div class="row"><span class="lbl">Miền</span><span class="val">'+selMien.value+'</span></div>'+
-          '<div class="row"><span class="lbl">GĐV</span><span class="val">'+gdv+'</span></div>'+
-          '<div class="row"><span class="lbl">QLKV</span><span class="val">'+qlkv+'</span></div>'+
-          '<div class="row"><span class="lbl">Cửa hàng</span><span class="val">'+tenCH+'</span></div>'+
-          '<div class="row"><span class="lbl">Số KHTT</span><span class="val" style="color:#09843b;font-size:16px;font-weight:800">'+soKHTT.toLocaleString('vi-VN')+' khách</span></div>'+
-          '<div class="row"><span class="lbl">Ảnh</span><span class="val">'+fileName+' ✅</span></div>';
-        document.getElementById('mainCard').style.display='none';
-        document.getElementById('successCard').style.display='block';
-      })
-      .catch(function(err){
-        console.error(err);
-        btnSubmit.disabled=false;
-        btnSubmit.textContent='✅ Gửi Báo Cáo';
-        alert('❌ Gửi thất bại, vui lòng thử lại.');
-      });
+    // Gửi qua hidden form để bypass CORS hoàn toàn
+    var hiddenForm = document.createElement('form');
+    hiddenForm.method = 'POST';
+    hiddenForm.action = APPS_SCRIPT_URL;
+    hiddenForm.target = 'hidden-iframe';
+    hiddenForm.style.display = 'none';
+    var hiddenInput = document.createElement('input');
+    hiddenInput.type = 'hidden';
+    hiddenInput.name = 'data';
+    hiddenInput.value = JSON.stringify(payload);
+    hiddenForm.appendChild(hiddenInput);
+    document.body.appendChild(hiddenForm);
+
+    var iframe = document.getElementById('hidden-iframe');
+    if (!iframe) {
+      iframe = document.createElement('iframe');
+      iframe.name = 'hidden-iframe';
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+    }
+
+    // Show success immediately (no-cors style)
+    var d=document.getElementById('successDetail');
+    d.innerHTML=
+      '<div class="row"><span class="lbl">Thời gian</span><span class="val">'+ts+'</span></div>'+
+      '<div class="row"><span class="lbl">Miền</span><span class="val">'+selMien.value+'</span></div>'+
+      '<div class="row"><span class="lbl">GĐV</span><span class="val">'+gdv+'</span></div>'+
+      '<div class="row"><span class="lbl">QLKV</span><span class="val">'+qlkv+'</span></div>'+
+      '<div class="row"><span class="lbl">Cửa hàng</span><span class="val">'+tenCH+'</span></div>'+
+      '<div class="row"><span class="lbl">Số KHTT</span><span class="val" style="color:#09843b;font-size:16px;font-weight:800">'+soKHTT.toLocaleString('vi-VN')+' khách</span></div>'+
+      '<div class="row"><span class="lbl">Ảnh</span><span class="val">'+fileName+' ✅</span></div>';
+    document.getElementById('mainCard').style.display='none';
+    document.getElementById('successCard').style.display='block';
+
+    hiddenForm.submit();
+    document.body.removeChild(hiddenForm);
   });
 
   setStep(1);
