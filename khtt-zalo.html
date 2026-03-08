@@ -404,9 +404,16 @@ document.addEventListener('DOMContentLoaded',function(){
   // KHTT input - chỉ số nguyên
   inputKHTT.addEventListener('input',function(){
     this.value=this.value.replace(/[^0-9]/g,'');
-    validateKHTT(true); checkSubmit();
+    var valid=validateKHTT(true);
+    // Enable file upload khi KHTT hợp lệ
+    inputFile.disabled=!valid;
+    checkSubmit();
   });
-  inputKHTT.addEventListener('blur',function(){ validateKHTT(true); checkSubmit(); });
+  inputKHTT.addEventListener('blur',function(){
+    var valid=validateKHTT(true);
+    inputFile.disabled=!valid;
+    checkSubmit();
+  });
 
   // File upload
   inputFile.addEventListener('change',function(){
