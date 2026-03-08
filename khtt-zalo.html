@@ -455,6 +455,8 @@ document.addEventListener('DOMContentLoaded',function(){
     btnSubmit.disabled=true;
     btnSubmit.textContent='⏳ Đang gửi...';
 
+    // Không gửi ảnh trong payload chính (quá lớn gây lỗi)
+    // Ảnh sẽ được upload riêng qua fetch sau khi data chính đã ghi xong
     var payload={
       formType:'khtt-zalo',
       thoiGian:ts,
@@ -463,9 +465,8 @@ document.addEventListener('DOMContentLoaded',function(){
       qlkv:qlkv,
       maSAP:maSAP,
       tenCH:tenCH,
-      hinhThuc:'Zalo',
       ghiChu:soKHTT+' KHTT Zalo',
-      photos:fileBase64?[fileBase64]:[]
+      photos:[]
     };
 
     // Gửi qua hidden form để bypass CORS hoàn toàn
