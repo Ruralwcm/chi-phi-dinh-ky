@@ -469,28 +469,15 @@ document.addEventListener('DOMContentLoaded',function(){
       photos:[]
     };
 
-    // Gửi qua hidden form để bypass CORS hoàn toàn
-    var hiddenForm = document.createElement('form');
-    hiddenForm.method = 'POST';
-    hiddenForm.action = APPS_SCRIPT_URL;
-    hiddenForm.target = 'hidden-iframe';
-    hiddenForm.style.display = 'none';
-    var hiddenInput = document.createElement('input');
-    hiddenInput.type = 'hidden';
-    hiddenInput.name = 'data';
-    hiddenInput.value = JSON.stringify(payload);
-    hiddenForm.appendChild(hiddenInput);
-    document.body.appendChild(hiddenForm);
+    // Gửi qua fetch no-cors (đơn giản nhất)
+    fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    }).catch(function(err){ console.error('Fetch error:', err); });
 
-    var iframe = document.getElementById('hidden-iframe');
-    if (!iframe) {
-      iframe = document.createElement('iframe');
-      iframe.name = 'hidden-iframe';
-      iframe.style.display = 'none';
-      document.body.appendChild(iframe);
-    }
-
-    // Show success immediately (no-cors style)
+    // Hiện success ngay (không chờ response vì no-cors)
     var d=document.getElementById('successDetail');
     d.innerHTML=
       '<div class="row"><span class="lbl">Thời gian</span><span class="val">'+ts+'</span></div>'+
@@ -499,12 +486,9 @@ document.addEventListener('DOMContentLoaded',function(){
       '<div class="row"><span class="lbl">QLKV</span><span class="val">'+qlkv+'</span></div>'+
       '<div class="row"><span class="lbl">Cửa hàng</span><span class="val">'+tenCH+'</span></div>'+
       '<div class="row"><span class="lbl">Số KHTT</span><span class="val" style="color:#09843b;font-size:16px;font-weight:800">'+soKHTT.toLocaleString('vi-VN')+' khách</span></div>'+
-      '<div class="row"><span class="lbl">Ảnh</span><span class="val">'+fileName+' ✅</span></div>';
+      '<div class="row"><span class="lbl">Ảnh</span><span class="val">'+(fileName?fileName+' ✅':'Không có')+'</span></div>';
     document.getElementById('mainCard').style.display='none';
     document.getElementById('successCard').style.display='block';
-
-    hiddenForm.submit();
-    document.body.removeChild(hiddenForm);
   });
 
   setStep(1);
