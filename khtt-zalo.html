@@ -456,16 +456,16 @@ document.addEventListener('DOMContentLoaded',function(){
     btnSubmit.textContent='⏳ Đang gửi...';
 
     var payload={
-      sheetName:'KHTT Zalo',
+      formType:'khtt-zalo',
       thoiGian:ts,
       mien:selMien.value,
       gdv:gdv,
       qlkv:qlkv,
       maSAP:maSAP,
       tenCH:tenCH,
-      soKHTT:soKHTT,
-      anhBase64:fileBase64,
-      anhTen:fileName
+      hinhThuc:'Zalo',
+      ghiChu:soKHTT+' KHTT Zalo',
+      photos:fileBase64?[fileBase64]:[]
     };
 
     fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
