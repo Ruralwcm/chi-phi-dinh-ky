@@ -183,10 +183,20 @@ textarea:read-only{background:#f0f7ff;color:#1a73e8;font-weight:600;cursor:defau
 
       <hr class="divider">
 
-      <!-- 4. Giá trị -->
+      <!-- 4. Số lượng / Đơn giá / Thành tiền -->
+      <div style="display:flex;gap:10px;margin-bottom:10px">
+        <div class="field" style="flex:1;margin-bottom:0">
+          <label>Số Lượng <span class="req">*</span></label>
+          <input type="text" id="inputSoLuong" placeholder="VD: 10" inputmode="numeric" disabled>
+        </div>
+        <div class="field" style="flex:2;margin-bottom:0">
+          <label>Đơn Giá (VNĐ) <span class="req">*</span></label>
+          <input type="text" id="inputDonGia" placeholder="VD: 50.000" inputmode="numeric" disabled>
+        </div>
+      </div>
       <div class="field">
-        <label>Giá Trị Trình Duyệt -VAT (VNĐ) <span class="req">*</span></label>
-        <input type="text" id="inputGiaTri" placeholder="Nhập số tiền..." inputmode="numeric" disabled>
+        <label>Thành Tiền -VAT (VNĐ)</label>
+        <input type="text" id="inputGiaTri" placeholder="= Số lượng × Đơn giá" readonly style="background:#f0f7ff;color:#1a73e8;font-weight:700;cursor:default">
         <div class="err" id="errGT"></div>
         <div class="ok" id="okGT"></div>
         <!-- Cảnh báo vượt mức an toàn -->
@@ -474,6 +484,8 @@ document.addEventListener('DOMContentLoaded',function(){
   selLoai=document.getElementById('selLoai');
   inputGT=document.getElementById('inputGiaTri');
   inputDG=document.getElementById('inputDienGiai');
+  var inputSL=document.getElementById('inputSoLuong');
+  var inputDG2=document.getElementById('inputDonGia');
   btnSubmit=document.getElementById('btnSubmit');
   h1=document.getElementById('h1');
   errGT=document.getElementById('errGT');
@@ -544,8 +556,9 @@ document.addEventListener('DOMContentLoaded',function(){
   selLoai.addEventListener('change',function(){
     resetFrom(5);
     if(!this.value){setStep(4);return;}
-    inputGT.disabled=false;
-    inputGT.focus();
+    inputSL.disabled=false;
+    inputDG2.disabled=false;
+    inputSL.focus();
     // Show/hide PR field based on hạng mục
     var reqPR=CP_LIMITS[this.value]&&CP_LIMITS[this.value].requirePR;
     wrapPR.style.display=reqPR?'block':'none';
@@ -556,26 +569,30 @@ document.addEventListener('DOMContentLoaded',function(){
     updateDienGiai();
   });
 
-  // Field 4 - Giá trị
-  inputGT.addEventListener('input',function(){
-    // Format với dấu phân tách hàng nghìn
-    var raw=this.value.replace(/[^0-9]/g,'');
-    var cursor=this.selectionStart;
-    var oldLen=this.value.length;
-    if(raw==='') { this.value=''; }
-    else {
-      var num=parseInt(raw,10);
-      this.value=num.toLocaleString('vi-VN');
-    }
-    // Giữ cursor hợp lý sau format
-    var newLen=this.value.length;
-    var diff=newLen-oldLen;
-    try{ this.setSelectionRange(cursor+diff, cursor+diff); }catch(e){}
+  // Field 4 - Số lượng & Đơn giá → tự tính Thành tiền
+  function fmtInput(el){
+    var raw=el.value.replace(/[^0-9]/g,'');
+    var cursor=el.selectionStart;
+    var oldLen=el.value.length;
+    if(raw===''){el.value='';}
+    else{var num=parseInt(raw,10);el.value=num.toLocaleString('vi-VN');}
+    var diff=el.value.length-oldLen;
+    try{el.setSelectionRange(cursor+diff,cursor+diff);}catch(e){}
+  }
+  function calcThanhTien(){
+    var sl=parseInt((inputSL.value||'').replace(/[^0-9]/g,''),10)||0;
+    var dg=parseInt((inputDG2.value||'').replace(/[^0-9]/g,''),10)||0;
+    var tt=sl*dg;
+    if(tt>0){inputGT.value=tt.toLocaleString('vi-VN');}
+    else{inputGT.value='';}
     var ok=validateGT(true);
     if(ok) enableTimeFields();
     checkSubmit();
-  });
-  inputGT.addEventListener('blur',function(){ validateGT(true); checkSubmit(); });
+  }
+  inputSL.addEventListener('input',function(){ fmtInput(this); calcThanhTien(); });
+  inputSL.addEventListener('blur',function(){ calcThanhTien(); });
+  inputDG2.addEventListener('input',function(){ fmtInput(this); calcThanhTien(); });
+  inputDG2.addEventListener('blur',function(){ calcThanhTien(); });
 
   // PR input — chỉ nhận số
   inputPR.addEventListener('input',function(){
@@ -648,7 +665,9 @@ document.addEventListener('DOMContentLoaded',function(){
     btnSubmit.disabled=true;
     btnSubmit.textContent='⏳ Đang gửi...';
 
-    var payload={thoiGian:ts,gdv:gdv,qlkv:qlkv,maSAP:maSAP,tenCH:tenCH,loaiChiPhi:loai,giaTri:gtRaw,soPR:soPR,thoiGianPhatSinh:thoiGian,dienGiai:dienGiai};
+    var soLuong=parseInt(document.getElementById('inputSoLuong').value.replace(/[^0-9]/g,''),10)||0;
+    var donGia=parseInt(document.getElementById('inputDonGia').value.replace(/[^0-9]/g,''),10)||0;
+    var payload={thoiGian:ts,gdv:gdv,qlkv:qlkv,maSAP:maSAP,tenCH:tenCH,loaiChiPhi:loai,soLuong:soLuong,donGia:donGia,giaTri:gtRaw,soPR:soPR,thoiGianPhatSinh:thoiGian,dienGiai:dienGiai};
 
     fetch(APPS_SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
       .then(function(){
@@ -805,7 +824,9 @@ function resetFrom(n){
   if(n<=3){selCH.innerHTML='<option value="">— Chọn QLKV trước —</option>';selCH.disabled=true;}
   if(n<=4){selLoai.disabled=true;selLoai.value='';}
   if(n<=5){
-    inputGT.disabled=true;inputGT.value='';inputGT.className='';
+    document.getElementById('inputSoLuong').disabled=true;document.getElementById('inputSoLuong').value='';
+    document.getElementById('inputDonGia').disabled=true;document.getElementById('inputDonGia').value='';
+    inputGT.value='';inputGT.className='';
     errGT.style.display='none';okGT.style.display='none';
     warnBox.classList.remove('show');
     document.getElementById('wrapPR').style.display='none';
