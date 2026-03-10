@@ -564,26 +564,32 @@ document.addEventListener('DOMContentLoaded',function(){
     if(!this.value){setStep(4);return;}
     var slMax=(CP_LIMITS[this.value]&&CP_LIMITS[this.value].soLuongMax!=null)?CP_LIMITS[this.value].soLuongMax:0;
     if(slMax===1){
-      // Cố định Số lượng = 1
+      // Cố định Số lượng = 1 — dùng disabled + hiển thị qua display field
       inputSL.value='1';
-      inputSL.readOnly=true;
+      inputSL.setAttribute('readonly','readonly');
+      inputSL.setAttribute('tabindex','-1');
       inputSL.style.background='#f0f7ff';
       inputSL.style.color='#1a73e8';
       inputSL.style.fontWeight='700';
+      inputSL.style.cursor='not-allowed';
+      inputSL.style.pointerEvents='none';
       inputSL.disabled=false;
       document.getElementById('helperSL').textContent='🔒 Số lượng cố định = 1 cho hạng mục này';
     } else {
       // Nhập tự do 1-13
       inputSL.value='';
-      inputSL.readOnly=false;
+      inputSL.removeAttribute('readonly');
+      inputSL.removeAttribute('tabindex');
       inputSL.style.background='';
       inputSL.style.color='';
       inputSL.style.fontWeight='';
+      inputSL.style.cursor='';
+      inputSL.style.pointerEvents='';
       inputSL.disabled=false;
       document.getElementById('helperSL').textContent='Nhập số lượng (1 – 13)';
     }
     inputDG2.disabled=false;
-    inputSL.focus();
+    if(slMax!==1) inputSL.focus(); else inputDG2.focus();
     // Show/hide PR field based on hạng mục
     var reqPR=CP_LIMITS[this.value]&&CP_LIMITS[this.value].requirePR;
     wrapPR.style.display=reqPR?'block':'none';
@@ -614,8 +620,11 @@ document.addEventListener('DOMContentLoaded',function(){
     if(ok) enableTimeFields();
     checkSubmit();
   }
+  inputSL.addEventListener('keydown',function(e){
+    if(this.hasAttribute('readonly')){e.preventDefault();return false;}
+  });
   inputSL.addEventListener('input',function(){
-    if(this.readOnly) return;
+    if(this.hasAttribute('readonly')){this.value='1';return;}
     // Only allow digits, no thousand separator for SL
     var raw=this.value.replace(/[^0-9]/g,'');
     this.value=raw;
@@ -865,8 +874,10 @@ function resetFrom(n){
   if(n<=4){selLoai.disabled=true;selLoai.value='';}
   if(n<=5){
     var slEl=document.getElementById('inputSoLuong');
-    slEl.disabled=true;slEl.value='';slEl.readOnly=false;
+    slEl.disabled=true;slEl.value='';
+    slEl.removeAttribute('readonly');slEl.removeAttribute('tabindex');
     slEl.style.background='';slEl.style.color='';slEl.style.fontWeight='';
+    slEl.style.cursor='';slEl.style.pointerEvents='';
     document.getElementById('helperSL').textContent='';
     document.getElementById('errSL').style.display='none';
     document.getElementById('inputDonGia').disabled=true;document.getElementById('inputDonGia').value='';
