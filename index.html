@@ -187,7 +187,9 @@ textarea:read-only{background:#f0f7ff;color:#1a73e8;font-weight:600;cursor:defau
       <div style="display:flex;gap:10px;margin-bottom:10px">
         <div class="field" style="flex:1;margin-bottom:0">
           <label>Số Lượng <span class="req">*</span></label>
-          <input type="text" id="inputSoLuong" placeholder="VD: 10" inputmode="numeric" disabled>
+          <input type="text" id="inputSoLuong" placeholder="1 – 13" inputmode="numeric" disabled>
+          <div class="helper" id="helperSL"></div>
+          <div class="err" id="errSL" style="display:none"></div>
         </div>
         <div class="field" style="flex:2;margin-bottom:0">
           <label>Đơn Giá (VNĐ) <span class="req">*</span></label>
@@ -360,8 +362,9 @@ function buildData(csvText){
   var iGDV=h.indexOf('GĐV'), iQLKV=h.indexOf('QLKV'), iTT=h.indexOf('Tình Trạng');
   var iMien=h.indexOf('Miền');
   var iMucCP=h.indexOf('Mục chi phí'), iMucAT=h.indexOf('Mức an toàn'), iCB=h.indexOf('Cảnh báo'), iKhaibaoPR=h.indexOf('Khai báo PR');
+  var iSoLuongMax=h.indexOf('Số lượng Max');
 
-  // Build CP limits & list from col K/L/M
+  // Build CP limits & list from col K/L/M/N/P
   CP_LIMITS={};
   MUC_CP=[];
   rows.slice(1).forEach(function(r){
@@ -369,9 +372,12 @@ function buildData(csvText){
     var mucAT=(r[iMucAT]||'').trim();
     var cb=(r[iCB]||'').trim();
     var khaibaoPR=(r[iKhaibaoPR]||'').trim();
+    var slMax=(iSoLuongMax>=0?(r[iSoLuongMax]||'').trim():'');
     if(mucCP && !CP_LIMITS[mucCP]){
       var num=parseInt((mucAT||'0').replace(/[^0-9]/g,''))||0;
-      CP_LIMITS[mucCP]={mucAnToan:num,canhBao:cb,requirePR:khaibaoPR==='Có'};
+      // slMax: '1' = fixed at 1, '0' or '' = free range 1-13
+      var slMaxNum=slMax===''?0:parseInt(slMax,10);
+      CP_LIMITS[mucCP]={mucAnToan:num,canhBao:cb,requirePR:khaibaoPR==='Có',soLuongMax:slMaxNum};
       MUC_CP.push(mucCP);
     }
   });
@@ -556,7 +562,26 @@ document.addEventListener('DOMContentLoaded',function(){
   selLoai.addEventListener('change',function(){
     resetFrom(5);
     if(!this.value){setStep(4);return;}
-    inputSL.disabled=false;
+    var slMax=(CP_LIMITS[this.value]&&CP_LIMITS[this.value].soLuongMax!=null)?CP_LIMITS[this.value].soLuongMax:0;
+    if(slMax===1){
+      // Cố định Số lượng = 1
+      inputSL.value='1';
+      inputSL.readOnly=true;
+      inputSL.style.background='#f0f7ff';
+      inputSL.style.color='#1a73e8';
+      inputSL.style.fontWeight='700';
+      inputSL.disabled=false;
+      document.getElementById('helperSL').textContent='🔒 Số lượng cố định = 1 cho hạng mục này';
+    } else {
+      // Nhập tự do 1-13
+      inputSL.value='';
+      inputSL.readOnly=false;
+      inputSL.style.background='';
+      inputSL.style.color='';
+      inputSL.style.fontWeight='';
+      inputSL.disabled=false;
+      document.getElementById('helperSL').textContent='Nhập số lượng (1 – 13)';
+    }
     inputDG2.disabled=false;
     inputSL.focus();
     // Show/hide PR field based on hạng mục
@@ -589,7 +614,19 @@ document.addEventListener('DOMContentLoaded',function(){
     if(ok) enableTimeFields();
     checkSubmit();
   }
-  inputSL.addEventListener('input',function(){ fmtInput(this); calcThanhTien(); });
+  inputSL.addEventListener('input',function(){
+    if(this.readOnly) return;
+    // Only allow digits, no thousand separator for SL
+    var raw=this.value.replace(/[^0-9]/g,'');
+    this.value=raw;
+    // Validate range 1-13
+    var sl=parseInt(raw,10)||0;
+    var errSL=document.getElementById('errSL');
+    if(raw&&(sl<1||sl>13)){
+      errSL.textContent='❌ Số lượng phải từ 1 đến 13';errSL.style.display='block';
+    } else {errSL.style.display='none';}
+    calcThanhTien();
+  });
   inputSL.addEventListener('blur',function(){ calcThanhTien(); });
   inputDG2.addEventListener('input',function(){ fmtInput(this); calcThanhTien(); });
   inputDG2.addEventListener('blur',function(){ calcThanhTien(); });
@@ -798,12 +835,15 @@ function validateGT(show){
 function checkSubmit(){
   var loai=document.getElementById('selLoai').value;
   var gtOk=validateGT(false);
-  var warnOk=true; // cảnh báo chỉ hiển thị, không block submit
   var prOk=validatePR(false);
   var tgOk=selectedTimes.length>0;
   var dgOk=inputDG.value.trim().length>0;
   var mienOk=document.getElementById('selMien').value;
-  btnSubmit.disabled=!(mienOk&&selGDVQLKV.value&&selCH.value&&loai&&gtOk&&warnOk&&prOk&&tgOk&&dgOk);
+  // Validate SL
+  var slEl=document.getElementById('inputSoLuong');
+  var sl=parseInt((slEl.value||'').replace(/[^0-9]/g,''),10)||0;
+  var slOk=sl>=1&&sl<=13;
+  btnSubmit.disabled=!(mienOk&&selGDVQLKV.value&&selCH.value&&loai&&slOk&&gtOk&&prOk&&tgOk&&dgOk);
 }
 
 // ========== STEP ==========
@@ -824,7 +864,11 @@ function resetFrom(n){
   if(n<=3){selCH.innerHTML='<option value="">— Chọn QLKV trước —</option>';selCH.disabled=true;}
   if(n<=4){selLoai.disabled=true;selLoai.value='';}
   if(n<=5){
-    document.getElementById('inputSoLuong').disabled=true;document.getElementById('inputSoLuong').value='';
+    var slEl=document.getElementById('inputSoLuong');
+    slEl.disabled=true;slEl.value='';slEl.readOnly=false;
+    slEl.style.background='';slEl.style.color='';slEl.style.fontWeight='';
+    document.getElementById('helperSL').textContent='';
+    document.getElementById('errSL').style.display='none';
     document.getElementById('inputDonGia').disabled=true;document.getElementById('inputDonGia').value='';
     inputGT.value='';inputGT.className='';
     errGT.style.display='none';okGT.style.display='none';
