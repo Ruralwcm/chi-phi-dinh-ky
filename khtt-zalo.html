@@ -204,6 +204,7 @@ input.invalid{border-color:#e53935;box-shadow:0 0 0 3px rgba(229,57,53,0.10)}
 <script>
 var SHEET_ID = '1fMmEm1GC9aei_3oeu2vcadPVsUM9ms9eVhm99d7pF8A';
 var SHEET_NAME = 'Store_list';
+var STATIC_STORELIST_URL = 'storelist.json';
 var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxeW2WtmPzr3GSWUK_NzOW4C3J5Q950Ji2fEswP1kH_HGitUCFJNnr2f00CR4HOFqT-/exec';
 
 var DATA = {};
@@ -251,9 +252,12 @@ function loadSheetData(){
       });
   }
 
-  tryFetch(urlGviz, urlExport)
-    .then(function(txt){
-      try{ buildData(txt); overlay.classList.remove('show'); }
+  // Try static JSON first, fallback to Google Sheets
+  fetch(STATIC_STORELIST_URL, {redirect:'follow'})
+    .then(function(r){ if(!r.ok) throw new Error('static fail'); return r.json(); })
+    .then(function(data){
+      var csv = jsonToCSV(data);
+      try{ buildData(csv); overlay.classList.remove('show'); }
       catch(e){
         console.error('buildData error:',e);
         overlay.classList.remove('show');
@@ -261,11 +265,35 @@ function loadSheetData(){
         errDiv.classList.add('show');
       }
     })
-    .catch(function(e){
-      console.error('Fetch error:',e);
-      overlay.classList.remove('show');
-      errDiv.classList.add('show');
+    .catch(function(){
+      tryFetch(urlGviz, urlExport)
+        .then(function(txt){
+          try{ buildData(txt); overlay.classList.remove('show'); }
+          catch(e){
+            console.error('buildData error:',e);
+            overlay.classList.remove('show');
+            errDiv.innerHTML='❌ Lỗi xử lý data: '+e.message+'<br><button class="retry-btn" onclick="loadSheetData()">🔄 Thử lại</button>';
+            errDiv.classList.add('show');
+          }
+        })
+        .catch(function(e){
+          console.error('Fetch error:',e);
+          overlay.classList.remove('show');
+          errDiv.classList.add('show');
+        });
     });
+}
+
+function jsonToCSV(data){
+  if(!data||!data.length) return '';
+  var keys=['maSAP','tenCH','tinhTrang','khaiTruong','mien','tinhTP','quanHuyen','qlkv','gdv','lat','lng'];
+  var header='Mã SAP,Tên cửa hàng,Tình Trạng,Khai Trương,Miền,Tỉnh/TP,Quận/huyện,QLKV,GĐV,Vĩ độ,Kinh độ';
+  var lines=[header];
+  data.forEach(function(s){
+    var row=keys.map(function(k){ var v=s[k]||''; return v.indexOf(',')>=0||v.indexOf('"')>=0?'"'+v.replace(/"/g,'""')+'"':v; });
+    lines.push(row.join(','));
+  });
+  return lines.join('\n');
 }
 
 function buildData(csvText){
