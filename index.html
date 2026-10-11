@@ -273,6 +273,7 @@ textarea:read-only{background:#f0f7ff;color:#1a73e8;font-weight:600;cursor:defau
 // ========== CONFIG ==========
 var SHEET_ID   = '1fMmEm1GC9aei_3oeu2vcadPVsUM9ms9eVhm99d7pF8A';
 var SHEET_NAME = 'Store_list';
+var STATIC_STORELIST_URL = 'storelist.json';
 var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxeW2WtmPzr3GSWUK_NzOW4C3J5Q950Ji2fEswP1kH_HGitUCFJNnr2f00CR4HOFqT-/exec';
 
 // ========== DATA ==========
@@ -334,24 +335,49 @@ function loadSheetData(){
       });
   }
 
-  tryFetch(urlGviz, urlExport)
-    .then(function(txt){
-      try {
-        buildData(txt);
-        overlay.classList.remove('show');
-      } catch(buildErr) {
-        console.error('buildData error:', buildErr);
-        overlay.classList.remove('show');
-        errDiv.innerHTML='❌ Lỗi xử lý data: '+buildErr.message+'<br><button class="retry-btn" onclick="loadSheetData()">🔄 Thử lại</button>';
-        errDiv.classList.add('show');
-      }
-    })
-    .catch(function(e){
-      console.error('Fetch error:', e);
+  // Try static JSON first, fallback to Google Sheets
+  fetch(STATIC_STORELIST_URL, {redirect:'follow'})
+    .then(function(r){ if(!r.ok) throw new Error('static fail'); return r.json(); })
+    .then(function(jsonData){
+      // Convert JSON to CSV format for buildData
+      var csv = jsonToCSV(jsonData);
+      buildData(csv);
       overlay.classList.remove('show');
-      errDiv.classList.add('show');
-      document.getElementById('dataInfo').textContent='❌ Lỗi tải data';
+    })
+    .catch(function(){
+      // Fallback to Google Sheets
+      tryFetch(urlGviz, urlExport)
+        .then(function(txt){
+          try {
+            buildData(txt);
+            overlay.classList.remove('show');
+          } catch(buildErr) {
+            console.error('buildData error:', buildErr);
+            overlay.classList.remove('show');
+            errDiv.innerHTML='❌ Lỗi xử lý data: '+buildErr.message+'<br><button class="retry-btn" onclick="loadSheetData()">🔄 Thử lại</button>';
+            errDiv.classList.add('show');
+          }
+        })
+        .catch(function(e){
+          console.error('Fetch error:', e);
+          overlay.classList.remove('show');
+          errDiv.classList.add('show');
+          document.getElementById('dataInfo').textContent='❌ Lỗi tải data';
+        });
     });
+}
+
+function jsonToCSV(jsonData){
+  // Convert static JSON (array of objects) to CSV string for buildData
+  if(!jsonData||!jsonData.length) return '';
+  var keys=['maSAP','tenCH','tinhTrang','khaiTruong','mien','tinhTP','quanHuyen','qlkv','gdv','lat','lng','','','','','','','','mucChiPhi','mucAnToan','canhBao','khaiBaoPR','soLuongMax'];
+  var header='Mã SAP,Tên cửa hàng,Tình Trạng,Khai Trương,Miền,Tỉnh/TP,Quận/huyện,QLKV,GĐV,Vĩ độ,Kinh độ,,,,,,,,Mục chi phí,Mức an toàn,Cảnh báo,Khai báo PR,Số lượng Max';
+  var lines=[header];
+  jsonData.forEach(function(s){
+    var row=keys.map(function(k){ var v=s[k]||''; return v.indexOf(',')>=0||v.indexOf('"')>=0?'"'+v.replace(/"/g,'""')+'"':v; });
+    lines.push(row.join(','));
+  });
+  return lines.join('\n');
 }
 
 function buildData(csvText){
