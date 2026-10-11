@@ -271,7 +271,7 @@ function loadSheetData(){
 function buildData(csvText){
   var rows=parseCSV(csvText);
   if(rows.length<2) return;
-  var h=rows[0];
+  var h=rows[0].map(function(x){ return (x||'').normalize('NFC'); });
   var iSAP=h.indexOf('Mã SAP'),iTen=h.indexOf('Tên cửa hàng');
   var iGDV=h.indexOf('GĐV'),iQLKV=h.indexOf('QLKV'),iTT=h.indexOf('Tình Trạng'),iMien=h.indexOf('Miền');
 
