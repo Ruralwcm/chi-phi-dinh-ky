@@ -5,11 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Duyệt Chi Phí Định Kỳ</title>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=IBM+Plex+Sans+Condensed:wght@400;600;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(145deg,#e8f0fe 0%,#f0f4f8 60%,#e8f5e9 100%);min-height:100vh;padding:16px 12px}
 .container{max-width:580px;margin:0 auto}
 .card{background:#fff;border-radius:16px;box-shadow:0 4px 24px rgba(26,115,232,0.10),0 1px 4px rgba(0,0,0,0.06);overflow:hidden}
-.card-header{background:linear-gradient(135deg,#1a73e8 0%,#0d47a1 100%);color:#fff;padding:20px 22px 16px}
+.card-header{background:linear-gradient(135deg,#0f5f57 0%,#0f5f57 100%);color:#fff;padding:20px 22px 16px}
 .card-header h1{font-size:17px;font-weight:700}
 .card-header p{font-size:12px;opacity:0.85;margin-top:4px;line-height:1.5}
 .data-badge{font-size:11px;font-weight:600;opacity:0.9}
@@ -17,10 +18,10 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(145deg,#
 /* STEPS */
 .steps{display:flex;align-items:center;padding:13px 20px;background:#fff;border-bottom:1px solid #f0f0f0}
 .step{display:flex;align-items:center;gap:4px;font-size:10.5px;color:#bbb;font-weight:600;flex-shrink:0;transition:color .25s}
-.step.active{color:#1a73e8}
+.step.active{color:#0f5f57}
 .step.done{color:#34a853}
 .step-num{width:20px;height:20px;border-radius:50%;background:#e0e0e0;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .25s}
-.step.active .step-num{background:#1a73e8;box-shadow:0 0 0 3px rgba(26,115,232,0.18)}
+.step.active .step-num{background:#0f5f57;box-shadow:0 0 0 3px rgba(26,115,232,0.18)}
 .step.done .step-num{background:#34a853}
 .step-line{flex:1;height:2px;background:#e0e0e0;margin:0 3px;min-width:4px;transition:background .3s}
 .step-line.done{background:#34a853}
@@ -40,12 +41,12 @@ select{
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 11px center;padding-right:34px;cursor:pointer
 }
-select:focus,input:focus,textarea:focus{outline:none;border-color:#1a73e8;box-shadow:0 0 0 3px rgba(26,115,232,0.11)}
+select:focus,input:focus,textarea:focus{outline:none;border-color:#0f5f57;box-shadow:0 0 0 3px rgba(26,115,232,0.11)}
 select:disabled,input:disabled,textarea:disabled{background:#f7f7f7;color:#bbb;cursor:not-allowed;border-color:#ebebeb}
 input.valid{border-color:#34a853;box-shadow:0 0 0 3px rgba(52,168,83,0.10)}
 input.invalid{border-color:#e53935;box-shadow:0 0 0 3px rgba(229,57,53,0.10)}
 textarea{resize:vertical;min-height:60px;background-image:none;font-family:inherit}
-textarea:read-only{background:#f0f7ff;color:#1a73e8;font-weight:600;cursor:default}
+textarea:read-only{background:#f0f7ff;color:#0f5f57;font-weight:600;cursor:default}
 
 .helper{font-size:11.5px;color:#888;margin-top:4px;min-height:14px}
 .err{font-size:11.5px;color:#e53935;margin-top:4px;display:none;font-weight:500}
@@ -69,17 +70,17 @@ textarea:read-only{background:#f0f7ff;color:#1a73e8;font-weight:600;cursor:defau
 .time-group select{flex:1;min-width:80px}
 .time-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .time-tag{
-  background:#e8f0fe;color:#1a73e8;border:1.5px solid #1a73e8;
+  background:#e8f0fe;color:#0f5f57;border:1.5px solid #0f5f57;
   border-radius:20px;padding:4px 10px;font-size:12px;font-weight:600;
   display:flex;align-items:center;gap:5px;cursor:default
 }
 .time-tag .rm{cursor:pointer;font-size:14px;line-height:1;color:#e53935;font-weight:700}
 .time-tag .rm:hover{opacity:0.7}
-.time-preview{font-size:12px;color:#1a73e8;font-weight:600;margin-top:5px}
+.time-preview{font-size:12px;color:#0f5f57;font-weight:600;margin-top:5px}
 
 .submit-btn{
   width:100%;padding:13px;margin-top:18px;
-  background:linear-gradient(135deg,#1a73e8,#0d47a1);
+  background:linear-gradient(135deg,#0f5f57,#0f5f57);
   color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;
   transition:opacity .18s,transform .1s;box-shadow:0 2px 8px rgba(26,115,232,0.25)
 }
@@ -89,12 +90,12 @@ textarea:read-only{background:#f0f7ff;color:#1a73e8;font-weight:600;cursor:defau
 /* LOADING */
 .loading-overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,0.88);z-index:100;flex-direction:column;align-items:center;justify-content:center;gap:14px}
 .loading-overlay.show{display:flex}
-.spinner{width:42px;height:42px;border:4px solid #e0e0e0;border-top-color:#1a73e8;border-radius:50%;animation:spin 0.8s linear infinite}
+.spinner{width:42px;height:42px;border:4px solid #e0e0e0;border-top-color:#0f5f57;border-radius:50%;animation:spin 0.8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-text{font-size:14px;color:#555;font-weight:500}
 .load-error{display:none;background:#fff3f3;border:1px solid #ffcdd2;border-radius:10px;padding:14px;margin-bottom:14px;text-align:center;color:#c62828;font-size:13px}
 .load-error.show{display:block}
-.retry-btn{margin-top:8px;padding:7px 18px;background:#1a73e8;color:#fff;border:none;border-radius:7px;font-size:13px;cursor:pointer;font-weight:600}
+.retry-btn{margin-top:8px;padding:7px 18px;background:#0f5f57;color:#fff;border:none;border-radius:7px;font-size:13px;cursor:pointer;font-weight:600}
 
 /* SUCCESS */
 .success-card{display:none;background:#fff;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.10);padding:32px 24px;text-align:center}
@@ -106,6 +107,16 @@ textarea:read-only{background:#f0f7ff;color:#1a73e8;font-weight:600;cursor:defau
 .success-detail .lbl{font-size:10.5px;color:#888;text-transform:uppercase;letter-spacing:0.4px;white-space:nowrap;flex-shrink:0;min-width:90px}
 .success-detail .val{font-weight:700;color:#1a1a1a;word-break:break-word}
 .btn-reset{padding:11px 28px;background:#34a853;color:#fff;border:none;border-radius:9px;font-size:14px;cursor:pointer;font-weight:600}
+
+@media (prefers-color-scheme: dark) {
+  body{background:#0f1724;color:#e8ecf1}
+  .card,.stat-card,.app-card,.modal,.confirm-box,.login-box{background:#1a2332;border-color:#2a3646}
+  thead th{background:#1a2332;color:#cbd5e1;border-bottom-color:#2a3646}
+  td{border-bottom-color:#2a3646}
+  .sidebar{background:#0a2a24}
+  .topbar{background:#b3121b}
+  input,select,textarea{background:#1a2332;color:#e8ecf1;border-color:#2a3646}
+}
 </style>
 </head>
 <body>
@@ -198,7 +209,7 @@ textarea:read-only{background:#f0f7ff;color:#1a73e8;font-weight:600;cursor:defau
       </div>
       <div class="field">
         <label>Thành Tiền -VAT (VNĐ)</label>
-        <input type="text" id="inputGiaTri" placeholder="= Số lượng × Đơn giá" readonly style="background:#f0f7ff;color:#1a73e8;font-weight:700;cursor:default">
+        <input type="text" id="inputGiaTri" placeholder="= Số lượng × Đơn giá" readonly style="background:#f0f7ff;color:#0f5f57;font-weight:700;cursor:default">
         <div class="err" id="errGT"></div>
         <div class="ok" id="okGT"></div>
         <!-- Cảnh báo vượt mức an toàn -->
@@ -239,7 +250,7 @@ textarea:read-only{background:#f0f7ff;color:#1a73e8;font-weight:600;cursor:defau
           <select id="selDonViTG" disabled>
             <option value="">—</option>
           </select>
-          <button type="button" id="btnAddTG" disabled style="padding:10px 14px;background:#1a73e8;color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap">+ Thêm</button>
+          <button type="button" id="btnAddTG" disabled style="padding:10px 14px;background:#0f5f57;color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap">+ Thêm</button>
         </div>
         <div class="time-tags" id="timeTags"></div>
         <div class="time-preview" id="timePreview"></div>
@@ -595,7 +606,7 @@ document.addEventListener('DOMContentLoaded',function(){
       inputSL.setAttribute('readonly','readonly');
       inputSL.setAttribute('tabindex','-1');
       inputSL.style.background='#f0f7ff';
-      inputSL.style.color='#1a73e8';
+      inputSL.style.color='#0f5f57';
       inputSL.style.fontWeight='700';
       inputSL.style.cursor='not-allowed';
       inputSL.style.pointerEvents='none';
@@ -750,7 +761,7 @@ document.addEventListener('DOMContentLoaded',function(){
           '<div class="row"><span class="lbl">QLKV</span><span class="val">'+qlkv+'</span></div>'+
           '<div class="row"><span class="lbl">Cửa hàng</span><span class="val">'+tenCH+'</span></div>'+
           '<div class="row"><span class="lbl">Hạng mục</span><span class="val">'+loai+'</span></div>'+
-          '<div class="row"><span class="lbl">Giá trị</span><span class="val" style="color:#1a73e8;font-size:15px">'+fmtVND(gtRaw)+'</span></div>'+
+          '<div class="row"><span class="lbl">Giá trị</span><span class="val" style="color:#0f5f57;font-size:15px">'+fmtVND(gtRaw)+'</span></div>'+
           (soPR?'<div class="row"><span class="lbl">Số PR</span><span class="val">'+soPR+'</span></div>':'')+
           '<div class="row"><span class="lbl">Thời gian PS</span><span class="val">'+thoiGian+'</span></div>'+
           '<div class="row"><span class="lbl">Diễn giải</span><span class="val">'+dienGiai+'</span></div>';
