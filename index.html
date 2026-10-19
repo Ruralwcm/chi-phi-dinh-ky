@@ -7,7 +7,7 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=IBM+Plex+Sans+Condensed:wght@400;600;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(145deg,#e8f0fe 0%,#f0f4f8 60%,#e8f5e9 100%);min-height:100vh;padding:16px 12px}
+body{font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(145deg,#e8f0fe 0%,#f0f4f8 60%,#e8f0fe 100%);min-height:100vh;padding:16px 12px}
 .container{max-width:580px;margin:0 auto}
 .card{background:#fff;border-radius:16px;box-shadow:0 4px 24px rgba(26,115,232,0.10),0 1px 4px rgba(0,0,0,0.06);overflow:hidden}
 .card-header{background:linear-gradient(135deg,#d71920 0%,#d71920 100%);color:#fff;padding:20px 22px 16px}
@@ -19,12 +19,12 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(145deg,#
 .steps{display:flex;align-items:center;padding:13px 20px;background:#fff;border-bottom:1px solid #f0f0f0}
 .step{display:flex;align-items:center;gap:4px;font-size:10.5px;color:#bbb;font-weight:600;flex-shrink:0;transition:color .25s}
 .step.active{color:#d71920}
-.step.done{color:#34a853}
+.step.done{color:#1a3c6e}
 .step-num{width:20px;height:20px;border-radius:50%;background:#e0e0e0;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .25s}
 .step.active .step-num{background:#d71920;box-shadow:0 0 0 3px rgba(26,115,232,0.18)}
-.step.done .step-num{background:#34a853}
+.step.done .step-num{background:#1a3c6e}
 .step-line{flex:1;height:2px;background:#e0e0e0;margin:0 3px;min-width:4px;transition:background .3s}
-.step-line.done{background:#34a853}
+.step-line.done{background:#1a3c6e}
 @media(max-width:400px){.step-label{display:none}}
 
 .card-body{padding:20px 22px}
@@ -43,14 +43,14 @@ select{
 }
 select:focus,input:focus,textarea:focus{outline:none;border-color:#d71920;box-shadow:0 0 0 3px rgba(26,115,232,0.11)}
 select:disabled,input:disabled,textarea:disabled{background:#f7f7f7;color:#bbb;cursor:not-allowed;border-color:#ebebeb}
-input.valid{border-color:#34a853;box-shadow:0 0 0 3px rgba(52,168,83,0.10)}
+input.valid{border-color:#1a3c6e;box-shadow:0 0 0 3px rgba(52,168,83,0.10)}
 input.invalid{border-color:#e53935;box-shadow:0 0 0 3px rgba(229,57,53,0.10)}
 textarea{resize:vertical;min-height:60px;background-image:none;font-family:inherit}
 textarea:read-only{background:#f0f7ff;color:#d71920;font-weight:600;cursor:default}
 
 .helper{font-size:11.5px;color:#888;margin-top:4px;min-height:14px}
 .err{font-size:11.5px;color:#e53935;margin-top:4px;display:none;font-weight:500}
-.ok{font-size:11.5px;color:#34a853;margin-top:4px;display:none;font-weight:500}
+.ok{font-size:11.5px;color:#1a3c6e;margin-top:4px;display:none;font-weight:500}
 
 /* WARNING BOX */
 .warn-box{
@@ -100,13 +100,13 @@ textarea:read-only{background:#f0f7ff;color:#d71920;font-weight:600;cursor:defau
 /* SUCCESS */
 .success-card{display:none;background:#fff;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.10);padding:32px 24px;text-align:center}
 .success-icon{font-size:52px;margin-bottom:10px}
-.success-title{font-size:18px;font-weight:700;color:#2e7d32;margin-bottom:6px}
+.success-title{font-size:18px;font-weight:700;color:#1a3c6e;margin-bottom:6px}
 .success-sub{font-size:13px;color:#888;margin-bottom:14px}
 .success-detail{font-size:13px;color:#333;line-height:1.7;background:#f5faf5;border-radius:10px;padding:14px 16px;margin-bottom:16px;text-align:left;border:1px solid #e0f2e1}
 .success-detail .row{display:flex;gap:8px;margin-bottom:3px;align-items:baseline}
 .success-detail .lbl{font-size:10.5px;color:#888;text-transform:uppercase;letter-spacing:0.4px;white-space:nowrap;flex-shrink:0;min-width:90px}
 .success-detail .val{font-weight:700;color:#1a1a1a;word-break:break-word}
-.btn-reset{padding:11px 28px;background:#34a853;color:#fff;border:none;border-radius:9px;font-size:14px;cursor:pointer;font-weight:600}
+.btn-reset{padding:11px 28px;background:#1a3c6e;color:#fff;border:none;border-radius:9px;font-size:14px;cursor:pointer;font-weight:600}
 
 @media (prefers-color-scheme: dark) {
   body{background:#0f1724;color:#e8ecf1}
