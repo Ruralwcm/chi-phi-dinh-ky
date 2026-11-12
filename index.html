@@ -380,13 +380,15 @@ function loadSheetData(){
 
 function jsonToCSV(jsonData){
   // Convert static JSON (array of objects) to CSV string for buildData
+  // Robust: handles both camelCase & snake_case field names from storelist.json
   if(!jsonData||!jsonData.length) return '';
-  var keys=['ma_sap','ten_ch','tinh_trang','khai_truong','mien','tinh','huyen','qlkv','gdv','lat','lng','','','','','','','','mucChiPhi','mucAnToan','canhBao','khaiBaoPR','soLuongMax'];
+  function g(obj){for(var i=1;i<arguments.length;i++){var v=obj[arguments[i]];if(v!==undefined&&v!==null)return String(v);}return'';}
   var header='Mã SAP,Tên cửa hàng,Tình Trạng,Khai Trương,Miền,Tỉnh/TP,Quận/huyện,QLKV,GĐV,Vĩ độ,Kinh độ,,,,,,,,Mục chi phí,Mức an toàn,Cảnh báo,Khai báo PR,Số lượng Max';
   var lines=[header];
   jsonData.forEach(function(s){
-    var row=keys.map(function(k){ var v=s[k]||''; return v.indexOf(',')>=0||v.indexOf('"')>=0?'"'+v.replace(/"/g,'""')+'"':v; });
-    lines.push(row.join(','));
+    var cells=[g(s,'maSAP','ma_sap'),g(s,'tenCH','ten_ch'),g(s,'tinhTrang','tinh_trang'),g(s,'khaiTruong','khai_truong'),g(s,'mien','mien'),g(s,'tinhTP','tinh'),g(s,'quanHuyen','huyen'),g(s,'qlkv','qlkv'),g(s,'gdv','gdv'),g(s,'lat','lat'),g(s,'lng','lng'),'','','','','','','',g(s,'mucChiPhi','mucChiPhi'),g(s,'mucAnToan','mucAnToan'),g(s,'canhBao','canhBao'),g(s,'khaiBaoPR','khaiBaoPR'),g(s,'soLuongMax','soLuongMax')];
+    cells=cells.map(function(v){return(v.indexOf(',')>=0||v.indexOf('"')>=0)?'"'+v.replace(/"/g,'""')+'"':v;});
+    lines.push(cells.join(','));
   });
   return lines.join('\n');
 }
