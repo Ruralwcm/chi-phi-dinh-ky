@@ -711,6 +711,17 @@ document.addEventListener('DOMContentLoaded',function(){
       });
     }
     selDonViTG.disabled=false;
+    // Auto-add when all 3 selections are valid
+    if(selNam.value && selLoaiTG.value && selDonViTG.value){
+      btnAddTG.click();
+    }
+  });
+
+  // Auto-add time when DonViTG changes after all 3 selected
+  selDonViTG.addEventListener('change',function(){
+    if(selNam.value && selLoaiTG.value && this.value){
+      btnAddTG.click();
+    }
   });
 
   btnAddTG.addEventListener('click',function(){
