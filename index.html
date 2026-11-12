@@ -381,7 +381,7 @@ function loadSheetData(){
 function jsonToCSV(jsonData){
   // Convert static JSON (array of objects) to CSV string for buildData
   if(!jsonData||!jsonData.length) return '';
-  var keys=['maSAP','tenCH','tinhTrang','khaiTruong','mien','tinhTP','quanHuyen','qlkv','gdv','lat','lng','','','','','','','','mucChiPhi','mucAnToan','canhBao','khaiBaoPR','soLuongMax'];
+  var keys=['ma_sap','ten_ch','tinh_trang','khai_truong','mien','tinh','huyen','qlkv','gdv','lat','lng','','','','','','','','mucChiPhi','mucAnToan','canhBao','khaiBaoPR','soLuongMax'];
   var header='Mã SAP,Tên cửa hàng,Tình Trạng,Khai Trương,Miền,Tỉnh/TP,Quận/huyện,QLKV,GĐV,Vĩ độ,Kinh độ,,,,,,,,Mục chi phí,Mức an toàn,Cảnh báo,Khai báo PR,Số lượng Max';
   var lines=[header];
   jsonData.forEach(function(s){
