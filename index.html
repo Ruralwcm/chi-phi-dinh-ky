@@ -118,6 +118,7 @@ textarea:read-only{background:#f0f7ff;color:#d71920;font-weight:600;cursor:defau
   input,select,textarea{background:#1a2332;color:#e8ecf1;border-color:#2a3646}
 }
 </style>
+<script src="store-source.js"></script>
 </head>
 <body>
 <div class="container">
@@ -347,8 +348,24 @@ function loadSheetData(){
   }
 
   // Try static JSON first, fallback to Google Sheets
-  fetch(STATIC_STORELIST_URL, {redirect:'follow'})
-    .then(function(r){ if(!r.ok) throw new Error('static fail'); return r.json(); })
+  STORE_SOURCE.live(function(r){ return {ma_sap:r.ma_sap, ten_ch:r.ten_ch, tinh_trang:r.tinh_trang,
+      khai_truong:r.khai_truong ? r.khai_truong.slice(8,10)+'/'+r.khai_truong.slice(5,7)+'/'+r.khai_truong.slice(0,4) : '',
+      mien:r.mien, tinh:r.tinh, huyen:r.huyen, qlkv:r.qlkv, gdv:r.gdv, lat:r.lat, lng:r.lng}; })
+    .catch(function(err){
+      console.warn('API_Stores loi, dung file tinh:', err);
+      return fetch(STATIC_STORELIST_URL, {redirect:'follow'})
+        .then(function(r){ if(!r.ok) throw new Error('static fail'); return r.json(); });
+    })
+    .then(function(jsonData){
+      // Cau hinh muc chi phi (dong CFG_*) van nam o file tinh
+      return fetch(STATIC_STORELIST_URL, {redirect:'follow'})
+        .then(function(r){ return r.ok ? r.json() : []; })
+        .catch(function(){ return []; })
+        .then(function(st){
+          var cfg = (st||[]).filter(function(x){ return String(x.ma_sap||'').indexOf('CFG') === 0; });
+          return cfg.concat(jsonData);
+        });
+    })
     .then(function(jsonData){
       // Convert JSON to CSV format for buildData
       var csv = jsonToCSV(jsonData);
